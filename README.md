@@ -119,4 +119,4 @@ This project is licensed under the [MIT License](LICENSE).
 
 ## Contact
 
-Oluwole Adetifa – [LinkedIn](https://www.linkedin.com/in/oluwoleadetifa) – [oluw.adetifa@example.com](mailto:oluw.adetifa@example.com)
+Oluwole Adetifa – [LinkedIn]((https://www.linkedin.com/in/oluwole-adetifa-278586113/)) – [oluw.adetifa@example.com](mailto:oluw.adetifa@example.com)
