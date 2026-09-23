@@ -1,122 +1,75 @@
 # Accelerating Batch Image Processing
 
-[![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+A Python benchmarking framework for comparing image-processing performance across **sequential execution**, **multithreading**, **multiprocessing**, and **GPU acceleration**.
 
-## Overview
+The project explores a practical systems question: **when does additional parallelism actually improve throughput, and when does coordination or transfer overhead erase the benefit?**
 
-This repository contains a Python-based benchmarking framework for evaluating image-processing pipelines across **sequential execution**, **multithreading**, **multiprocessing**, and **GPU acceleration**. The goal is to compare throughput, runtime, and scalability for CPU-bound workloads and lightweight GPU tasks.
+## What the project measures
 
-The project systematically tests different resolutions, batch sizes, and parallelization strategies to determine optimal execution models for high-performance image processing.
+The benchmark suite evaluates:
 
----
+- wall-clock runtime
+- throughput in images/second
+- speedup relative to a sequential baseline
+- scaling behavior across worker counts
+- CPU-versus-GPU tradeoffs
 
-## Features
+The image-processing pipeline includes grayscale conversion, histogram equalization, Gaussian blur, Sobel filtering, and Canny edge detection.
 
-* CPU benchmarking:
+## Execution models
 
-  * Sequential execution
-  * `ThreadPoolExecutor` multithreading
-  * `ProcessPoolExecutor` multiprocessing
-* GPU benchmarking with CUDA-enabled pipelines
-* Image-processing pipeline includes:
+- Sequential Python execution
+- ThreadPoolExecutor multithreading
+- ProcessPoolExecutor multiprocessing
+- CUDA-enabled GPU processing
 
-  1. Grayscale conversion
-  2. Histogram equalization
-  3. Gaussian blur (7×7 kernel)
-  4. Sobel filtering (X & Y)
-  5. Canny edge detection
-* Performance metrics:
-
-  * Wall-clock time
-  * Throughput (images/sec)
-  * Speedup relative to sequential baseline
-* Synthetic dataset generation for reproducibility
-
----
-
-## Installation
-
-### Requirements
-
-* Python 3.10+
-* Libraries:
-
-  ```bash
-  pip install numpy opencv-python matplotlib tqdm
-  ```
-* Optional for GPU acceleration:
-
-  ```bash
-  pip install cupy-cuda11x torch torchvision
-  ```
-
----
-
-## Usage
-
-1. Clone the repository:
-
-   ```bash
-   git clone https://github.com/your-username/batch-image-processing.git
-   cd batch-image-processing
-   ```
-
-2. Generate synthetic images:
-
-   ```bash
-   python generate_dataset.py --resolution 256 512 1024 --count 100 500 1000
-   ```
-
-3. Run benchmarks:
-
-   ```bash
-   python run_benchmarks.py --mode sequential
-   python run_benchmarks.py --mode threadpool --workers 8
-   python run_benchmarks.py --mode processpool --workers 8
-   python run_benchmarks.py --mode gpu
-   ```
-
-4. Visualize results:
-
-   ```bash
-   python plot_results.py
-   ```
-
----
-
-## Results
-
-* **CPU Performance:** Multithreading (8 threads) provided the highest throughput for small-to-medium images, outperforming multiprocessing in most cases due to low thread overhead and GIL release by native libraries.
-* **GPU Performance:** GPU acceleration achieved moderate speedup, but performance was limited by small, lightweight operations and host-device transfer overhead.
-* **Combined CPU–GPU Comparison:** Threaded CPU execution often surpassed GPU performance for unbatched, lightweight pipelines.
-
-Example CPU throughput table (images/sec):
+## Representative results
 
 | Resolution | Sequential | Threads (8) | Processes (8) |
-| ---------- | ---------- | ----------- | ------------- |
-| 256×256    | 499.67     | **1930.92** | 1022.67       |
-| 512×512    | 131.56     | **451.55**  | 395.49        |
-| 1024×1024  | 35.43      | **110.73**  | 103.86        |
+| --- | ---: | ---: | ---: |
+| 256×256 | 499.67 img/s | **1930.92 img/s** | 1022.67 img/s |
+| 512×512 | 131.56 img/s | **451.55 img/s** | 395.49 img/s |
+| 1024×1024 | 35.43 img/s | **110.73 img/s** | 103.86 img/s |
 
----
+For the tested workloads, multithreading performed particularly well because much of the heavy image-processing work executes in native libraries that can release the Python GIL. GPU execution was not automatically faster: for lightweight, unbatched operations, kernel-launch and host/device-transfer overhead could dominate.
 
-## License
+## Repository structure
 
-This project is licensed under the [MIT License](LICENSE).
+- `scripts/` — benchmark and dataset-generation code
+- `results/` — benchmark outputs and experiment artifacts
+- `README.md` — project overview and representative findings
 
----
+## Setup
 
-## Acknowledgements
+Requirements:
 
-* Inspired by research on CPU-GPU hybrid pipelines and Amdahl’s Law.
-* References:
+- Python 3.10+
+- NumPy
+- OpenCV
+- Matplotlib
+- tqdm
+- optional CUDA-compatible dependencies for GPU experiments
 
-  * Qian, D. (2016). *High performance computing: a brief review and prospects.*
-  * Hangün, B., & Eyecioğlu, Ö. (2017). *Performance comparison between OpenCV CPU and GPU functions.*
-  * Teodoro, G., et al. (2012, 2013). *Accelerating large scale image analyses on hybrid systems.*
+Clone the repository:
 
----
+```bash
+git clone https://github.com/oluwoleadetifa/HPC-Project.git
+cd HPC-Project
+```
 
-## Contact
+Install the CPU dependencies:
 
-Oluwole Adetifa – [LinkedIn](https://www.linkedin.com/in/oluwoleadetifa) – [oluw.adetifa@example.com](mailto:oluw.adetifa@example.com)
+```bash
+pip install numpy opencv-python matplotlib tqdm
+```
+
+For GPU experiments, install the CUDA-compatible packages appropriate for your environment.
+
+## Why this project matters
+
+The project is less about "GPU = faster" and more about understanding **execution-model tradeoffs**. It demonstrates why workload size, native-library behavior, serialization, communication overhead, synchronization, and host/device transfer all matter when choosing a parallel architecture.
+
+## Author
+
+Oluwole Adetifa  
+[LinkedIn](https://www.linkedin.com/in/oluwole-adetifa-278586113) • [Portfolio](https://oluwoleadetifa.com)
